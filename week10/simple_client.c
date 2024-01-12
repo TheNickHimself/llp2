@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define PORT 11111    /* the port client will be connecting to */
+#define PORT 1234    /* the port client will be connecting to */
 #define MSG "Hi i am a client\n"
 #define MAX_DATA_SIZE 25 /* max number of bytes we can get at once */
 
