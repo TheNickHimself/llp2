@@ -7,6 +7,7 @@
 # Ignore all object files 
 *.o 
 *.exe*
+*.txt*
 
 # Ignore bin folder
 bin

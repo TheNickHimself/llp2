@@ -3,13 +3,11 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
-#include "dummy_http.h"
+#include "hServer.h"
 
 #include <time.h>
 #include <ctype.h>
-//int logger(char (*msgPtr)[1024]);
 
-// pthread_mutex_t mutex_timer = PTHREAD_MUTEX_INITIALIZER;
 
 void *handle_client(void *socket)
 {
@@ -31,50 +29,27 @@ void *handle_client(void *socket)
 	}
 	else
 	{
-		/*
-		char(*testPtr)[1024] = &buffer;
-		printf("\nPointer %p\n", testPtr);
-		printf("Pointer %s\n", *testPtr);
-		printf("Pointer %p\n", &testPtr);
-		*/
+
 		t1 = time(NULL) + (10 * 20); // server get time stamp
 
 		for (int i = 0; i < strlen(buffer); i++)
 		{
 			buffer[i] = toupper(buffer[i]);
 		}
-		// buffer[strcspn(buffer, "\n")] = 0;
+
 		int val = strcmp(buffer, "GETTIME\n");
 		if (val == 0)
 		{
+			num_bytes = send(newsockfd, OK_REPLY, strlen(ERROR_INVAL_MTP), 0);
+			if (num_bytes < 0)
+				fprintf(stderr, "Thread %lu ERROR: send() failed\n", (unsigned long)thread_id);
+
 			char nowTime[30];
 			sprintf(nowTime, "[%d-%02d-%02d %02d:%02d:%02d]\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
-			//time_t nowEpoch = time(NULL);
-
 			printf("Thread %lu sending response\n", (unsigned long)thread_id);
-			/*
-			printf("Sent nowTime: %s\n", nowTime);
-			num_bytes = send(newsockfd, nowTime, strlen(nowTime), 0);
-			if (num_bytes < 0)
-				fprintf(stderr, "Thread %lu ERROR: send() failed\n", (unsigned long)thread_id);
 
-			
-			printf("Sent Buffer: %s\n", buffer);
-			num_bytes = send(newsockfd, buffer, strlen(buffer), 0);
-			if (num_bytes < 0)
-				fprintf(stderr, "Thread %lu ERROR: send() failed\n", (unsigned long)thread_id);
-			
-			
-
-			printf("Sent NewEpoch: %ld\n", nowEpoch);
-			num_bytes = send(newsockfd, (const void *)&nowEpoch, sizeof(time_t), 0);
-			if (num_bytes < 0)
-				fprintf(stderr, "Thread %lu ERROR: send() failed\n", (unsigned long)thread_id);
-			*/
-			// pthread_mutex_lock(&mutex_timer);
 			t2 = time(NULL) + (10 * 65); // server response time stamp
-			// pthread_mutex_unlock(&mutex_timer);
 
 			printf("Sent t1: %ld\n", t1);
 			num_bytes = send(newsockfd, (const void *)&t1, sizeof(time_t), 0);
@@ -125,7 +100,7 @@ int main(int argc, char *argv[])
 	/* Initialize socket structure (sockarrd_in) */
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // or INADDR_ANY
-	serv_addr.sin_port = htons(HTTP_PORT);
+	serv_addr.sin_port = htons(PORT);
 
 	/* Bind the host address */
 	if (bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
