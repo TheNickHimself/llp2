@@ -7,8 +7,9 @@
 
 #include <time.h>
 #include <ctype.h>
+//int logger(char (*msgPtr)[1024]);
 
-pthread_mutex_t mutex_timer = PTHREAD_MUTEX_INITIALIZER;
+// pthread_mutex_t mutex_timer = PTHREAD_MUTEX_INITIALIZER;
 
 void *handle_client(void *socket)
 {
@@ -30,7 +31,13 @@ void *handle_client(void *socket)
 	}
 	else
 	{
-		t1 = time(NULL) + (10 * 55); // server get time stamp
+		/*
+		char(*testPtr)[1024] = &buffer;
+		printf("\nPointer %p\n", testPtr);
+		printf("Pointer %s\n", *testPtr);
+		printf("Pointer %p\n", &testPtr);
+		*/
+		t1 = time(NULL) + (10 * 20); // server get time stamp
 
 		for (int i = 0; i < strlen(buffer); i++)
 		{
@@ -43,29 +50,31 @@ void *handle_client(void *socket)
 			char nowTime[30];
 			sprintf(nowTime, "[%d-%02d-%02d %02d:%02d:%02d]\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
-			time_t nowEpoch = time(NULL);
+			//time_t nowEpoch = time(NULL);
 
 			printf("Thread %lu sending response\n", (unsigned long)thread_id);
-
+			/*
 			printf("Sent nowTime: %s\n", nowTime);
 			num_bytes = send(newsockfd, nowTime, strlen(nowTime), 0);
 			if (num_bytes < 0)
 				fprintf(stderr, "Thread %lu ERROR: send() failed\n", (unsigned long)thread_id);
 
+			
 			printf("Sent Buffer: %s\n", buffer);
 			num_bytes = send(newsockfd, buffer, strlen(buffer), 0);
 			if (num_bytes < 0)
 				fprintf(stderr, "Thread %lu ERROR: send() failed\n", (unsigned long)thread_id);
+			
+			
 
 			printf("Sent NewEpoch: %ld\n", nowEpoch);
 			num_bytes = send(newsockfd, (const void *)&nowEpoch, sizeof(time_t), 0);
 			if (num_bytes < 0)
 				fprintf(stderr, "Thread %lu ERROR: send() failed\n", (unsigned long)thread_id);
-
-
-			//pthread_mutex_lock(&mutex_timer);
-			t2 = time(NULL)  + (10 * 60); // server response time stamp
-			//pthread_mutex_unlock(&mutex_timer);
+			*/
+			// pthread_mutex_lock(&mutex_timer);
+			t2 = time(NULL) + (10 * 65); // server response time stamp
+			// pthread_mutex_unlock(&mutex_timer);
 
 			printf("Sent t1: %ld\n", t1);
 			num_bytes = send(newsockfd, (const void *)&t1, sizeof(time_t), 0);

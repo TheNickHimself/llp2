@@ -13,13 +13,23 @@
 
 int main(int argc, char *argv[])
 {
+    FILE *file;
+    file = fopen("/home/student/Documents/GitHub/llp2/sysHome/log/log.txt", "a+"); // Open file in append mode
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "ERROR: Log File!\n");
+        return 1;
+    }
+    fprintf(file, "\n----------------------START OF LOG---------------------\n");
+
     int offset;
     int roundTrip;
 
-    //time_t t0, t1, t2, t3;
-    time_t timeArr[4];
+    // time_t t0, t1, t2, t3;
+    time_t timeArr[4], timeLog;
     struct tm *timeInfo;
-    // struct tm *local_time = localtime(&epoch_time);
+    timeInfo = localtime(&timeLog);
 
     int sockfd, numbytes;
 
@@ -54,38 +64,38 @@ int main(int argc, char *argv[])
     else
     {
         timeArr[0] = time(NULL); // client send time stamp
+        userInput[strcspn(userInput, "\n")] = 0;
+        fprintf(file, "<--OUT: %s:  %s\n", userInput, asctime(timeInfo));
     }
 
-    printf("Data sent: %s", userInput);
-
-    char arr[2][MAX_DATA_SIZE];
+    printf("SENT:  %s\n\n", userInput);
+    
+    /*
     time_t nowEp;
 
-    for (size_t i = 0; i < 3; i++)
+    numbytes = recv(sockfd, (void *)&nowEp, MAX_DATA_SIZE, 0);
+    if (numbytes == -1)
     {
-        if (i == 2)
-        {
-            numbytes = recv(sockfd, (void *)&nowEp, MAX_DATA_SIZE, 0);
-            if (numbytes == -1)
-            {
-                printf("recv() failed\n");
-                return -4;
-            }
-        }
-
-        if (i != 2)
-        {
-            numbytes = recv(sockfd, (void *)&arr[i], MAX_DATA_SIZE, 0);
-            if (numbytes == -1)
-            {
-                printf("recv() failed\n");
-                return -4;
-            }
-        }
+        printf("recv() failed\n");
+        return -4;
     }
-    printf("Received 0: %s\n", arr[0]);
-    printf("Received 1: %s\n", arr[1]);
-    printf("Received Ep: %ld\n", nowEp);
+
+
+    char arr[MAX_DATA_SIZE + 1];
+    numbytes = recv(sockfd, (void *)&arr, MAX_DATA_SIZE, 0);
+    if (numbytes == -1)
+    {
+        printf("recv() failed\n");
+        return -4;
+    }
+    
+    arr[strcspn(arr, "\n")] = 0;
+    fprintf(file, "-->IN: %s:  %s", arr, asctime(timeInfo));
+    printf("Replying to: %s\n", arr);
+    
+    fprintf(file, "-->IN: %ld:  %s", nowEp, asctime(timeInfo));
+    printf("Received Epoch: %ld\n", nowEp);
+    */
 
     numbytes = recv(sockfd, (void *)&timeArr[1], MAX_DATA_SIZE, 0);
     if (numbytes == -1)
@@ -99,13 +109,15 @@ int main(int argc, char *argv[])
         printf("recv() failed\n");
         return -4;
     }
-    timeArr[3] = time(NULL) + (10 * 65);
+    timeArr[3] = time(NULL) + (10 * 68);
 
+    printf("Received: TIME t1:%ld  t2:%ld\n\n", timeArr[1], timeArr[2]);
 
     for (size_t i = 0; i < 4; i++)
     {
         timeInfo = localtime(&timeArr[i]);
         printf("t%ld: %ld %s\n", i, timeArr[i], asctime(timeInfo));
+        fprintf(file, "-->IN: t%ld: %ld %s\n", i, timeArr[i], asctime(timeInfo));
     }
 
     close(sockfd);
@@ -115,6 +127,38 @@ int main(int argc, char *argv[])
 
     printf("Offset: %d\n", offset);
     printf("Delay: %d\n", roundTrip);
+    fprintf(file, "-->IN: Offset: %d\n", offset);
+    fprintf(file, "-->IN: Delay: %d\n", roundTrip);
+
+    fprintf(file, "----------------------END OF LOG---------------------\n\n");
+    fclose(file);
+    return 0;
+}
+
+/*
+int logger(char (*msgPtr)[1024])
+{
+    time_t timeLog = time(NULL);
+    struct tm *timeLogInf;
+
+    timeLogInf = localtime(&timeLog);
+
+    FILE *file;
+
+    file = fopen("/home/student/Documents/GitHub/llp2/sysHome/log/log.txt", "a+"); // Open file in append mode
+
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error opening file!\n");
+        return 1;
+    }
+
+    //fprintf(file, "%ld : %s", timeLog, asctime(timeLogInf));
+    fprintf(file, "%s:  %s", *msgPtr, asctime(timeLogInf));
+
+    fclose(file);
 
     return 0;
 }
+*/

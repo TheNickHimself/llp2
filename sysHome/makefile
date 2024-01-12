@@ -1,4 +1,4 @@
-build_all: clean clean client server
+all: clean clean client server
 
 client:
 	gcc -Wall -o client simple_client.c
